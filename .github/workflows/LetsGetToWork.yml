@@ -1,0 +1,262 @@
+- name: First interaction
+  uses: actions/first-interaction@v1.3.0
+  with:
+    # Token for the repository. Can be passed in using {{ secrets.GITHUB_TOKEN }}
+    repo-token: 
+    # Comment to post on an individual's first issue
+    issue-message: # optional
+    # Comment to post on an individual's first pull request
+    pr-message: # optional
+    
+- name: Android CI
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+  - name: Android Builder Alpha
+  # You may pin to the exact commit or the version.
+  # uses: vgaidarji/android-github-actions-build@0888eff41ad409a802aa4ccd7790a91891da9056
+  uses: vgaidarji/android-github-actions-build@v1.0.1
+
+  - name: Android Builder Beta
+  # You may pin to the exact commit or the version.
+  # uses: b4s36t4/Android-Action@bb5c066db6ca0824ee09ee640ca222888a0c2877
+  uses: b4s36t4/Android-Action@0.0.1
+               
+    steps:
+    - uses: actions/checkout@v4
+    - name: set up JDK 11
+      uses: actions/setup-java@v3
+      with:
+        java-version: '11'
+        distribution: 'temurin'
+        cache: gradle
+
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+    - name: Build with Gradle
+      run: ./gradlew build
+      
+- name: Publish to NuGet
+  # You may pin to the exact commit or the version.
+  # uses: tedd/publish-nuget-neo@8280d4649639b061518aa366de86e1b483666002
+  uses: tedd/publish-nuget-neo@v1.0.2
+  with:
+    # NuGet API key to authenticate on NuGet server. DO NOT PUT KEY DIRECTLY IN HERE. Use Secrets function in GitHub for example, i.e. dollarsign{{secrets.YOUR_NUGET_API_KEY}}.
+    NUGET_KEY: 
+    # Full path to project file. (Example: src/MyNuGetProject/MyNuGetProject.csproj) (Default: Will scan all .csproj/.fsproj/.vbproj files and use first it finds that has GeneratePackageOnBuild set to true.)
+    PROJECT_FILE_PATH: # optional
+    # URL to NuGet server. (Default: https://api.nuget.org)
+    NUGET_SOURCE: # optional, default is https://api.nuget.org
+    # Add symbols to NuGet package. (Default: false)
+    INCLUDE_SYMBOLS: # optional
+    # Current Git commit should be tagged upon successful upload to NuGet. Note: This will prevent publish if tag already exists. (Default: false)
+    TAG_COMMIT: # optional
+    # Name of Git tag. * will be replaced by version number. (Default: v*)
+    TAG_FORMAT: # optional, default is v*
+    # NuGet package name. This is used for checking NuGet server if package version already exists. (Default: name extracted from PROJECT_FILE_PATH)
+    PACKAGE_NAME: # optional
+    # Path to file containing version number to extract using regex. (Default: $PROJECT_FILE_PATH)
+    VERSION_FILE_PATH: # optional
+    # Regex pattern to extract version info in a capturing group. (Default: ^\s*<Version>(.*)<\/Version>\s*$)
+    VERSION_REGEX: # optional, default is ^\s*<Version>\s*(.*?)\s*<\/Version>\s*$
+    # Useful with external providers like Nerdbank.GitVersioning where you could for example set it to variable (dollar){{env.GitBuildVersionSimple}}. Ignores VERSION_FILE_PATH & VERSION_REGEX.
+    VERSION_STATIC: # optional
+    # Rebuild project in release mode? You may turn this off if you have built project in previous step. (default: true)
+    REBUILD_PROJECT: # optional, default is true
+    # Log level (DEBUG, INFO, WARN). (default: DEBUG)
+    LOG_LEVEL: # optional, default is DEBUG
+
+    - name: Create Branches
+  # You may pin to the exact commit or the version.
+  # uses: borgespro/create-squad-release-branches@3a8bd5758f8009609b14ebef856ba82cb1e5360b
+  uses: borgespro/create-squad-release-branches@v1.0.6
+  with:
+    # Prefix for new branch name
+    prefix: # optional, default is release
+    # The branch to create
+    branch: # optional, default is ${GITHUB_HEAD_REF}
+    # The SHA1 value for the branch reference
+    sha: # optional
+    # A list of squad names
+    squads: # optional
+    # Github token
+    GITHUB_TOKEN: # optional
+
+   
+- name: Create Release Model
+  # You may pin to the exact commit or the version.
+  # uses: noriban/gh-create-release@9d10a697d5cdf8a10ca2c32dbb19cdbcab2af894
+  uses: noriban/gh-create-release@v1
+  with:
+    # The name of the tag. This should come from the webhook payload, `github.GITHUB_REF` when a user pushes a new tag
+    tag_name: 
+    # The name of the release. For example, `Release v1.0.1`
+    release_name: 
+    # Text describing the contents of the tag.
+    body: # optional
+    # Path to file with information about the tag.
+    body_path: # optional
+    # `true` to create a draft (unpublished) release, `false` to create a published one. Default: `false`
+    draft: # optional
+    # `true` to identify the release as a prerelease. `false` to identify the release as a full release. Default: `false`
+    prerelease: # optional
+    # Any branch or commit SHA the Git tag is created from, unused if the Git tag already exists. Default: SHA of current commit
+    commitish: # optional
+    # Owner of the repository if it is not the current one
+    owner: # optional
+    # Repository on which to release.  Used only if you want to create the release on another repo
+    repo: # optional
+
+- name: Action JS Template
+  # You may pin to the exact commit or the version.
+  # uses: actions-cool/action-js-template@c3dec9ca388e7f68b446075704a8d75beed9e26f
+  uses: actions-cool/action-js-template@v1
+  with:
+    # Secret GitHub API token to use for making API requests.
+    GITHUB_TOKEN: # default is ${{ github.token }}
+
+            - name: github-update-readme
+  # You may pin to the exact commit or the version.
+  # uses: theboi/github-update-readme@68eb072d5da8f248bd35cbcb9cc4d21191be976e
+  uses: theboi/github-update-readme@v1.3.0
+  with:
+    # The header of your README.md. Markdown supported.
+    header: # default is 
+    # The subheader of your README.md. Markdown supported.
+    subhead: # optional, default is 
+    # The footer of your README.md. Markdown supported.
+    footer: # optional, default is 
+    # Path of your README.md file.
+    path: # optional, default is README.md
+    # Override the default branch/tag ref.
+    ref: # optional, default is master
+    # Number of repositories to load.
+    repoCount: # optional, default is 6
+    # Number of repositories to load per row.
+    reposPerRow: # optional, default is 3
+    # Length (in pixels) of each side of the square image.
+    imageSize: # optional, default is 200
+    # Types of event to exclude from the recent activity table. Read more on this repository's README.md.
+    excludeActivity: # optional, default is []
+    # Repositories to exclude from the recent activity table. Read more on this repository's README.md.
+    excludeRepo: # optional, default is []
+    # Customise the README.md file format without forking this repository. Read more on this repository's README.md. Markdown supported.
+    customReadmeFile: # optional, default is ## ${header}
+    
+- name: action-status
+  # You may pin to the exact commit or the version.
+  # uses: dobladov/github-status-action@4c30ae6753b91f8697a5151bc2cb666a04d2be19
+  uses: dobladov/github-status-action@2.0.0
+  with:
+    # Use secrets.GITHUB_TOKEN or your own token if you need to trigger other workflows the use "on: status"
+    authToken: 
+    # The status of the check: success, error, failure or pending
+    state: 
+    # The context, this is displayed as the name of the check
+    context: # optional, default is default
+    # Short text explaining the status of the check
+    description: # optional, default is 
+    # Repostory owner, defaults to context github.repository_owner if omited
+    owner: # optional, default is ${{ github.repository_owner }}
+    # Repository, default to context github.repository if omited
+    repository: # optional, default is ${{ github.repository }}
+    # SHA of commit to update status on, defaults to context github.sha
+    sha: # optional, default is ${{ github.sha }}
+    # URL/URI to use for further details.
+    target_url: # optional
+
+ - name: github-update-readme
+  # You may pin to the exact commit or the version.
+  # uses: theboi/github-update-readme@68eb072d5da8f248bd35cbcb9cc4d21191be976e
+  uses: theboi/github-update-readme@v1.3.0
+  with:
+    # The header of your README.md. Markdown supported.
+    header: # default is 
+    # The subheader of your README.md. Markdown supported.
+    subhead: # optional, default is 
+    # The footer of your README.md. Markdown supported.
+    footer: # optional, default is 
+    # Path of your README.md file.
+    path: # optional, default is README.md
+    # Override the default branch/tag ref.
+    ref: # optional, default is master
+    # Number of repositories to load.
+    repoCount: # optional, default is 6
+    # Number of repositories to load per row.
+    reposPerRow: # optional, default is 3
+    # Length (in pixels) of each side of the square image.
+    imageSize: # optional, default is 200
+    # Types of event to exclude from the recent activity table. Read more on this repository's README.md.
+    excludeActivity: # optional, default is []
+    # Repositories to exclude from the recent activity table. Read more on this repository's README.md.
+    excludeRepo: # optional, default is []
+    # Customise the README.md file format without forking this repository. Read more on this repository's README.md. Markdown supported.
+    customReadmeFile: # optional, default is ## ${header}
+
+ - name: github-update-readme
+  # You may pin to the exact commit or the version.
+  # uses: theboi/github-update-readme@68eb072d5da8f248bd35cbcb9cc4d21191be976e
+  uses: theboi/github-update-readme@v1.3.0
+  with:
+    # The header of your README.md. Markdown supported.
+    header: # default is 
+    # The subheader of your README.md. Markdown supported.
+    subhead: # optional, default is 
+    # The footer of your README.md. Markdown supported.
+    footer: # optional, default is 
+    # Path of your README.md file.
+    path: # optional, default is README.md
+    # Override the default branch/tag ref.
+    ref: # optional, default is master
+    # Number of repositories to load.
+    repoCount: # optional, default is 6
+    # Number of repositories to load per row.
+    reposPerRow: # optional, default is 3
+    # Length (in pixels) of each side of the square image.
+    imageSize: # optional, default is 200
+    # Types of event to exclude from the recent activity table. Read more on this repository's README.md.
+    excludeActivity: # optional, default is []
+    # Repositories to exclude from the recent activity table. Read more on this repository's README.md.
+    excludeRepo: # optional, default is []
+    # Customise the README.md file format without forking this repository. Read more on this repository's README.md. Markdown supported.
+    customReadmeFile: # optional, default is ## ${header}
+
+- name: Git Auto Commit Log
+  # You may pin to the exact commit or the version.
+  # uses: tripheo0412/auto-commit-log-action@11d449d263471aeb5419e9dd7fc08906c0d30e49
+  uses: tripheo0412/auto-commit-log-action@v2.0.2
+  with:
+    # Commit message
+    commit_message: # optional, default is <TriggerCI> ${{ github.event.head_commit.author.username }}: ${{ github.event.head_commit.message }}
+    # Git branch name, where changes should be pushed too. Required if Action is used on the `pull_request` event
+    branch: # optional, default is 
+    # Commit options (eg. --no-verify)
+    commit_options: # optional
+    # File pattern used for `git add`. For example `src/\*.js`
+    file_pattern: # optional, default is .
+    # Local file path to the git repository. Defaults to the current directory (`.`)
+    repository: # optional, default is .
+    # Name used for the commit user
+    bot_user_name: 
+    # Email address used for the commit user
+    bot_user_email: 
+    # Value used for the commit author. Defaults to the username of whoever triggered this workflow run.
+    bot_author: # optional, default is ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
+    # Name used for the commit user
+    commit_user_name: # optional, default is ${{ github.event.head_commit.committer.username }}
+    # Email address used for the commit user
+    commit_user_email: # optional, default is ${{ github.event.head_commit.committer.email }}
+    # Message used to create a new git tag with the commit. Keep this empty, if no tag should be created.
+    tagging_message: # optional, default is 
+
+        
+          
